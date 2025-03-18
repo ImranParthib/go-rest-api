@@ -80,7 +80,29 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
-                <div className="flex justify-end p-2">
+                <div className="flex justify-between p-2">
+                    <button
+                        onClick={() => toggleWishlist(product)}
+                        className="p-1 rounded-full hover:bg-gray-200 flex items-center gap-1"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-6 w-6 ${isInWishlist(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'}`}
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={isInWishlist(product.id) ? 0 : 1.5}
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                            />
+                        </svg>
+                        <span className={`text-sm ${isInWishlist(product.id) ? 'text-red-500' : 'text-gray-500'}`}>
+                            {isInWishlist(product.id) ? 'Saved' : 'Add to Wishlist'}
+                        </span>
+                    </button>
+
                     <button
                         onClick={onClose}
                         className="p-1 rounded-full hover:bg-gray-200"
@@ -100,24 +122,6 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                             alt={product.name}
                             className="w-full h-[300px] md:h-[400px] object-cover"
                         />
-                        <button
-                            onClick={() => toggleWishlist(product)}
-                            className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className={`h-6 w-6 ${isInWishlist(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'}`}
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={isInWishlist(product.id) ? 0 : 1.5}
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                />
-                            </svg>
-                        </button>
                     </div>
 
                     {/* Product Details */}
