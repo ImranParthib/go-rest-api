@@ -1,6 +1,6 @@
 # Clothing Shop - Go REST API with Admin Panel
 
-A full-stack clothing shop application with a Go backend API and React/Remax frontend.
+A full-stack clothing shop application with a Go backend API and React/Remix frontend with Tailwind CSS.
 
 ## 📂 Project Structure
 
@@ -8,13 +8,12 @@ A full-stack clothing shop application with a Go backend API and React/Remax fro
 clothing-shop/
 ├── backend/         # Go API server
 │   └── main.go      # Server implementation
-├── frontend/        # React/Remax frontend
+├── frontend/        # React/Remix frontend
+│   ├── app/         # React components
+│   │   ├── routes/  # Frontend routes
+│   │   └── root.tsx # App root
 │   ├── public/      # Static files
-│   └── src/         # React components
-│       ├── pages/   # Frontend pages
-│       │   ├── index/  # Shop display
-│       │   └── admin/  # Admin panel
-│       └── app.tsx  # App root
+│   └── tailwind.config.js # Tailwind configuration
 └── go.mod           # Go modules file
 ```
 
@@ -64,28 +63,35 @@ cd frontend
 npm install
 npm run dev
 ```
+
+If you encounter any errors about 'remix' not being recognized, try installing the dependencies globally:
+```sh
+npm install -g @remix-run/dev @remix-run/serve
+```
+
 The frontend will be available at http://localhost:3000.
 
 ---
 
 ### 4️⃣ Accessing the Admin Panel
-Navigate to http://localhost:3000/pages/admin/index to access the admin panel where you can manage clothing products.
+Navigate to http://localhost:3000/admin to access the admin panel where you can manage clothing products.
 
 ---
 
 ## 🛍️ Features
 
 ### Shop Frontend
-- Browse all clothing items
-- Filter products by category
-- View product details including price, size, and color
+- **Browse Products**: View all clothing items
+- **Category Filtering**: Filter by product categories
+- **Responsive Design**: Works on mobile and desktop with Tailwind CSS
+- **Product Details**: View sizes, colors, prices and descriptions
 
 ### Admin Panel
-- Add new clothing items
-- Edit existing products
-- Delete products
-- Select categories, sizes and colors
-- Preview product images
+- **Product Management**: Add, edit and delete clothing items
+- **Image Preview**: Preview product images before saving
+- **Validation**: Form validation for required fields
+- **Category Selection**: Choose from predefined clothing categories
+- **Size Options**: Select from standard clothing sizes
 
 ---
 
@@ -96,6 +102,26 @@ Navigate to http://localhost:3000/pages/admin/index to access the admin panel wh
 - `POST /api/products` - Create a new product
 - `PUT /api/products/{id}` - Update an existing product
 - `DELETE /api/products/{id}` - Delete a product
+
+---
+
+## 🔧 Development
+
+### Frontend Technology
+The frontend uses:
+- **Remix**: Modern React framework for better routing and server components
+- **Tailwind CSS**: Utility-first CSS framework for responsive design
+- **TypeScript**: For type-safe development
+
+### Build for Production
+
+To build the frontend for production:
+```sh
+cd frontend
+npm run build
+```
+
+This will generate production-ready files in the 'build' directory.
 
 ---
 
