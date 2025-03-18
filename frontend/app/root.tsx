@@ -1,4 +1,4 @@
-import type { LinksFunction } from "@remix-run/node";
+import { LinksFunction } from "@remix-run/node";
 import {
     Links,
     LiveReload,
@@ -28,6 +28,25 @@ export default function App() {
                 <ScrollRestoration />
                 <Scripts />
                 <LiveReload />
+            </body>
+        </html>
+    );
+}
+
+export function ErrorBoundary() {
+    return (
+        <html>
+            <head>
+                <title>Oops!</title>
+                <Meta />
+                <Links />
+            </head>
+            <body>
+                <div className="error-container">
+                    <h1>Something went wrong</h1>
+                    <p>There was an error loading this page</p>
+                </div>
+                <Scripts />
             </body>
         </html>
     );
