@@ -1,0 +1,19 @@
+{
+    "name": "products-frontend",
+    "version": "1.0.0",
+    "description": "Frontend for Go REST API",
+    "main": "index.js",
+    "scripts": {
+        "dev": "remax build -w -t web",
+        "build": "remax build -t web"
+    },
+    "dependencies": {
+        "react": "^16.14.0",
+        "react-dom": "^16.14.0",
+        "remax": "^2.15.0"
+    },
+    "devDependencies": {
+        "@types/react": "^16.14.0",
+        "typescript": "^4.5.5"
+    }
+}
