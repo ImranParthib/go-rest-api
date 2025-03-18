@@ -10,6 +10,22 @@
     }
 }
 
+@keyframes ripple {
+    0% {
+        opacity: 1;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+
+.animate-ripple {
+    animation: ripple 0.8s ease-out;
+}
+
 @layer components {
     .btn {
         @apply px-4 py-2 rounded font-medium cursor-pointer;

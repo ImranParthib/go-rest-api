@@ -7,7 +7,7 @@ import {
     Scripts,
     ScrollRestoration,
 } from "@remix-run/react";
-
+import { ToastProvider } from '~/context/ToastContext';
 import styles from "./tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -24,7 +24,9 @@ export default function App() {
                 <Links />
             </head>
             <body>
-                <Outlet />
+                <ToastProvider>
+                    <Outlet />
+                </ToastProvider>
                 <ScrollRestoration />
                 <Scripts />
                 <LiveReload />

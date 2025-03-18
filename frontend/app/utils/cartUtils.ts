@@ -55,6 +55,16 @@ export function useCart() {
         setCartTotal(total);
     };
 
+    // Check if an item is already in the cart with the specified size
+    const isInCart = (id: string, size: string): boolean => {
+        return cart.some(item => item.id === id && item.size === size);
+    };
+
+    // Get item from cart if it exists
+    const getCartItem = (id: string, size: string): CartItem | undefined => {
+        return cart.find(item => item.id === id && item.size === size);
+    };
+
     // Add item to cart
     const addToCart = (product: Omit<CartItem, 'quantity'>, quantity: number = 1, size: string) => {
         const newCart = [...cart];
@@ -73,6 +83,11 @@ export function useCart() {
         setCart(newCart);
         updateCartStats(newCart);
         saveCart(newCart);
+
+        return {
+            isNewItem: existingItemIndex < 0,
+            updatedQuantity: existingItemIndex >= 0 ? newCart[existingItemIndex].quantity : quantity
+        };
     };
 
     // Update item quantity
@@ -110,6 +125,8 @@ export function useCart() {
         cart,
         cartCount,
         cartTotal,
+        isInCart,
+        getCartItem,
         addToCart,
         updateQuantity,
         removeItem,

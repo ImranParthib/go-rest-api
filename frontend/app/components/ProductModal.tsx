@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCart } from '~/utils/cartUtils';
 import { useWishlist } from '~/utils/wishlistUtils';
+import { useToast } from '~/context/ToastContext';
 
 interface Product {
     id: string;
@@ -20,11 +21,18 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
-    const { addToCart } = useCart();
+    const { addToCart, isInCart, getCartItem } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
+    const { showToast } = useToast();
     const [selectedSize, setSelectedSize] = React.useState(product.size || "M");
     const [quantity, setQuantity] = React.useState(1);
-    const [message, setMessage] = React.useState("");
+    const [isAddedToCart, setIsAddedToCart] = React.useState(false);
+    const [isAddingToCart, setIsAddingToCart] = React.useState(false);
+
+    React.useEffect(() => {
+        // Check if the item is already in the cart with the selected size
+        setIsAddedToCart(isInCart(product.id, selectedSize));
+    }, [product.id, selectedSize, isInCart]);
 
     // Available sizes based on the product category
     const availableSizes = product.category === "Footwear"
@@ -32,7 +40,19 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
         : ["XS", "S", "M", "L", "XL", "XXL"];
 
     const handleAddToCart = () => {
-        addToCart({
+        setIsAddingToCart(true);
+
+        if (isInCart(product.id, selectedSize)) {
+            const existingItem = getCartItem(product.id, selectedSize);
+            const currentQty = existingItem ? existingItem.quantity : 0;
+
+            showToast(
+                `${product.name} (Size: ${selectedSize}) already in cart with quantity ${currentQty}. Quantity increased to ${currentQty + quantity}.`,
+                'info'
+            );
+        }
+
+        const result = addToCart({
             id: product.id,
             name: product.name,
             price: product.price,
@@ -41,11 +61,18 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
             size: selectedSize
         }, quantity, selectedSize);
 
-        setMessage("Added to cart!");
+        setIsAddedToCart(true);
 
+        if (result.isNewItem) {
+            showToast(`${product.name} added to cart!`, 'success');
+        } else {
+            showToast(`Updated ${product.name} quantity to ${result.updatedQuantity}!`, 'success');
+        }
+
+        // Reset adding state after animation
         setTimeout(() => {
-            setMessage("");
-        }, 3000);
+            setIsAddingToCart(false);
+        }, 800);
     };
 
     if (!isOpen) return null;
@@ -115,15 +142,23 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                                         <button
                                             key={size}
                                             className={`
-                        h-10 w-10 flex items-center justify-center rounded-md 
-                        ${selectedSize === size
+                                                h-10 w-10 flex items-center justify-center rounded-md 
+                                                ${selectedSize === size
                                                     ? 'bg-blue-500 text-white'
                                                     : 'bg-gray-100 hover:bg-gray-200'
                                                 }
-                      `}
+                                                ${isInCart(product.id, size)
+                                                    ? 'ring-2 ring-green-500'
+                                                    : ''}
+                                            `}
                                             onClick={() => setSelectedSize(size)}
                                         >
                                             {size}
+                                            {isInCart(product.id, size) && (
+                                                <span className="absolute -top-2 -right-2 h-4 w-4 bg-green-500 rounded-full flex items-center justify-center text-[10px] text-white">
+                                                    ✓
+                                                </span>
+                                            )}
                                         </button>
                                     ))}
                                 </div>
@@ -155,17 +190,17 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                             </div>
 
                             <button
-                                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
+                                className={`w-full ${isAddedToCart
+                                    ? "bg-green-500 hover:bg-green-600"
+                                    : "bg-blue-500 hover:bg-blue-600"} 
+                                    text-white font-medium py-2 px-4 rounded-md transition-all duration-300 relative overflow-hidden`}
                                 onClick={handleAddToCart}
                             >
-                                Add to Cart
+                                {isAddingToCart && (
+                                    <span className="absolute inset-0 bg-white/20 animate-ripple rounded-md"></span>
+                                )}
+                                {isAddedToCart ? `Update Cart (${getCartItem(product.id, selectedSize)?.quantity || 0} in cart)` : "Add to Cart"}
                             </button>
-
-                            {message && (
-                                <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-md text-center">
-                                    {message}
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>

@@ -22,7 +22,8 @@ export default function IndexPage() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { addToCart } = useCart();
+    const { addToCart, isInCart } = useCart();
+    const [recentlyAdded, setRecentlyAdded] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         fetch('http://localhost:8080/api/products')
@@ -69,6 +70,14 @@ export default function IndexPage() {
             color: product.color,
             size: product.size || 'M'
         }, 1, product.size || 'M');
+
+        // Set recently added state for this product
+        setRecentlyAdded(prev => ({ ...prev, [product.id]: true }));
+
+        // Reset the state after animation completes
+        setTimeout(() => {
+            setRecentlyAdded(prev => ({ ...prev, [product.id]: false }));
+        }, 2000);
     };
 
     if (loading) {
@@ -135,10 +144,23 @@ export default function IndexPage() {
 
                                 <div className="flex gap-2">
                                     <button
-                                        className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md text-sm"
+                                        className={`flex-1 ${recentlyAdded[product.id]
+                                            ? "bg-green-500 hover:bg-green-600"
+                                            : isInCart(product.id, product.size || 'M')
+                                                ? "bg-green-500 hover:bg-green-600"
+                                                : "bg-blue-500 hover:bg-blue-600"
+                                            } text-white font-medium py-2 px-4 rounded-md text-sm transition-all duration-300 relative overflow-hidden`}
                                         onClick={(e) => handleQuickAddToCart(e, product)}
                                     >
-                                        Add to Cart
+                                        {recentlyAdded[product.id] && (
+                                            <span className="absolute inset-0 bg-white/20 animate-ripple rounded-md"></span>
+                                        )}
+                                        {recentlyAdded[product.id]
+                                            ? "Added!"
+                                            : isInCart(product.id, product.size || 'M')
+                                                ? "In Cart"
+                                                : "Add to Cart"
+                                        }
                                     </button>
                                     <button
                                         className="flex-1 border border-blue-500 text-blue-500 hover:bg-blue-50 font-medium py-2 px-4 rounded-md text-sm"
