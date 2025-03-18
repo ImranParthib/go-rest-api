@@ -1,6 +1,7 @@
 # Go backend
 /backend/vendor/
 /backend/bin/
+/backend/tmp/
 /backend/*.exe
 /backend/*.exe~
 /backend/*.dll
@@ -9,11 +10,15 @@
 /backend/*.test
 /backend/*.out
 /backend/go.work
+/backend/.env
+/backend/.env.local
 
 # React/Node frontend
 /frontend/node_modules/
 /frontend/dist/
 /frontend/.cache/
+/frontend/build/
+/frontend/public/build/
 /frontend/.env
 /frontend/.env.local
 /frontend/.env.development.local
@@ -22,7 +27,6 @@
 /frontend/npm-debug.log*
 /frontend/yarn-debug.log*
 /frontend/yarn-error.log*
-/frontend/build/
 
 # IDE and editor files
 .idea/
@@ -31,3 +35,13 @@
 *.swo
 .DS_Store
 Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+
+# Dependencies' lock files (optional)
+# Uncomment if you want to commit these files
+# /frontend/package-lock.json
+# /frontend/yarn.lock
