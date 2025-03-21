@@ -2,6 +2,8 @@ import React from 'react';
 import { useCart } from '~/utils/cartUtils';
 import { useWishlist } from '~/utils/wishlistUtils';
 import { useToast } from '~/context/ToastContext';
+import { useShop } from '~/context/ShopContext';
+import LoadingIndicator from '~/components/LoadingIndicator';
 
 interface Product {
     id: string;
@@ -24,6 +26,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
     const { addToCart, isInCart, getCartItem } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { showToast } = useToast();
+    const { isCartLoading, isWishlistLoading } = useShop();
     const [selectedSize, setSelectedSize] = React.useState(product.size || "M");
     const [quantity, setQuantity] = React.useState(1);
     const [isAddedToCart, setIsAddedToCart] = React.useState(false);
@@ -84,20 +87,25 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                     <button
                         onClick={() => toggleWishlist(product)}
                         className="p-1 rounded-full hover:bg-gray-200 flex items-center gap-1"
+                        disabled={isWishlistLoading}
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className={`h-6 w-6 ${isInWishlist(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'}`}
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={isInWishlist(product.id) ? 0 : 1.5}
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                            />
-                        </svg>
+                        {isWishlistLoading ? (
+                            <LoadingIndicator size="sm" color="#ef4444" />
+                        ) : (
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className={`h-6 w-6 ${isInWishlist(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'}`}
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={isInWishlist(product.id) ? 0 : 1.5}
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                />
+                            </svg>
+                        )}
                         <span className={`text-sm ${isInWishlist(product.id) ? 'text-red-500' : 'text-gray-500'}`}>
                             {isInWishlist(product.id) ? 'Saved' : 'Add to Wishlist'}
                         </span>
@@ -199,11 +207,16 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                                     : "bg-blue-500 hover:bg-blue-600"} 
                                     text-white font-medium py-2 px-4 rounded-md transition-all duration-300 relative overflow-hidden`}
                                 onClick={handleAddToCart}
+                                disabled={isCartLoading || isAddingToCart}
                             >
-                                {isAddingToCart && (
-                                    <span className="absolute inset-0 bg-white/20 animate-ripple rounded-md"></span>
+                                {(isCartLoading || isAddingToCart) ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <LoadingIndicator size="sm" />
+                                        <span>{isAddedToCart ? "Updating..." : "Adding..."}</span>
+                                    </div>
+                                ) : (
+                                    isAddedToCart ? `Update Cart (${getCartItem(product.id, selectedSize)?.quantity || 0} in cart)` : "Add to Cart"
                                 )}
-                                {isAddedToCart ? `Update Cart (${getCartItem(product.id, selectedSize)?.quantity || 0} in cart)` : "Add to Cart"}
                             </button>
                         </div>
                     </div>

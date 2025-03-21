@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useShop } from '~/context/ShopContext';
 
 export interface WishlistItem {
     id: string;
@@ -38,13 +39,12 @@ export function getStoredWishlist(): WishlistItem[] {
 // Custom hook for wishlist functionality
 export function useWishlist() {
     const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
-    const [wishlistCount, setWishlistCount] = useState(0);
+    const { refreshWishlist, setIsWishlistLoading } = useShop();
 
     // Load wishlist from local storage on component mount
     useEffect(() => {
         const storedWishlist = getStoredWishlist();
         setWishlist(storedWishlist);
-        setWishlistCount(storedWishlist.length);
     }, []);
 
     // Check if an item is in the wishlist
@@ -57,22 +57,36 @@ export function useWishlist() {
         // Don't add if already in wishlist
         if (isInWishlist(product.id)) return;
 
+        setIsWishlistLoading(true);
+
         const newWishlist = [...wishlist, product];
         setWishlist(newWishlist);
-        setWishlistCount(newWishlist.length);
         saveWishlist(newWishlist);
+        refreshWishlist();
+
+        setTimeout(() => {
+            setIsWishlistLoading(false);
+        }, 500);
     };
 
     // Remove item from wishlist
     const removeFromWishlist = (id: string) => {
+        setIsWishlistLoading(true);
+
         const newWishlist = wishlist.filter(item => item.id !== id);
         setWishlist(newWishlist);
-        setWishlistCount(newWishlist.length);
         saveWishlist(newWishlist);
+        refreshWishlist();
+
+        setTimeout(() => {
+            setIsWishlistLoading(false);
+        }, 300);
     };
 
     // Toggle item in wishlist (add if not present, remove if present)
     const toggleWishlist = (product: WishlistItem) => {
+        setIsWishlistLoading(true);
+
         if (isInWishlist(product.id)) {
             removeFromWishlist(product.id);
         } else {
@@ -82,14 +96,19 @@ export function useWishlist() {
 
     // Clear wishlist
     const clearWishlist = () => {
+        setIsWishlistLoading(true);
+
         setWishlist([]);
-        setWishlistCount(0);
         saveWishlist([]);
+        refreshWishlist();
+
+        setTimeout(() => {
+            setIsWishlistLoading(false);
+        }, 300);
     };
 
     return {
         wishlist,
-        wishlistCount,
         isInWishlist,
         addToWishlist,
         removeFromWishlist,

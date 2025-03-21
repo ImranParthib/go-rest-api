@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useShop } from '~/context/ShopContext';
 
 export interface CartItem {
     id: string;
@@ -37,8 +38,8 @@ export function getStoredCart(): CartItem[] {
 // Custom hook for cart functionality
 export function useCart() {
     const [cart, setCart] = useState<CartItem[]>([]);
-    const [cartCount, setCartCount] = useState(0);
     const [cartTotal, setCartTotal] = useState(0);
+    const { refreshCart, setIsCartLoading } = useShop();
 
     // Load cart from local storage on component mount
     useEffect(() => {
@@ -49,9 +50,7 @@ export function useCart() {
 
     // Calculate cart count and total
     const updateCartStats = (items: CartItem[]) => {
-        const count = items.reduce((sum, item) => sum + item.quantity, 0);
         const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        setCartCount(count);
         setCartTotal(total);
     };
 
@@ -67,6 +66,8 @@ export function useCart() {
 
     // Add item to cart
     const addToCart = (product: Omit<CartItem, 'quantity'>, quantity: number = 1, size: string) => {
+        setIsCartLoading(true);
+
         const newCart = [...cart];
         const existingItemIndex = newCart.findIndex(
             item => item.id === product.id && item.size === size
@@ -83,6 +84,11 @@ export function useCart() {
         setCart(newCart);
         updateCartStats(newCart);
         saveCart(newCart);
+        refreshCart();
+
+        setTimeout(() => {
+            setIsCartLoading(false);
+        }, 500);
 
         return {
             isNewItem: existingItemIndex < 0,
@@ -94,6 +100,8 @@ export function useCart() {
     const updateQuantity = (id: string, size: string, quantity: number) => {
         if (quantity < 1) return;
 
+        setIsCartLoading(true);
+
         const newCart = cart.map(item =>
             (item.id === id && item.size === size)
                 ? { ...item, quantity }
@@ -103,27 +111,44 @@ export function useCart() {
         setCart(newCart);
         updateCartStats(newCart);
         saveCart(newCart);
+        refreshCart();
+
+        setTimeout(() => {
+            setIsCartLoading(false);
+        }, 300);
     };
 
     // Remove item from cart
     const removeItem = (id: string, size: string) => {
+        setIsCartLoading(true);
+
         const newCart = cart.filter(item => !(item.id === id && item.size === size));
         setCart(newCart);
         updateCartStats(newCart);
         saveCart(newCart);
+        refreshCart();
+
+        setTimeout(() => {
+            setIsCartLoading(false);
+        }, 300);
     };
 
     // Clear cart
     const clearCart = () => {
+        setIsCartLoading(true);
+
         setCart([]);
-        setCartCount(0);
         setCartTotal(0);
         saveCart([]);
+        refreshCart();
+
+        setTimeout(() => {
+            setIsCartLoading(false);
+        }, 300);
     };
 
     return {
         cart,
-        cartCount,
         cartTotal,
         isInCart,
         getCartItem,
